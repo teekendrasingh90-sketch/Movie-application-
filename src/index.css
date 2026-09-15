@@ -1,0 +1,61 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg: #08080A;
+    --ink: #F5F5F7;
+    --ink-dim: #9A9AA4;
+    --ink-faint: #5C5C66;
+    --glass: rgba(255, 255, 255, 0.06);
+    --glass-strong: rgba(255, 255, 255, 0.10);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --amber: #FFB020;
+    --amber-deep: #FF7A1A;
+    --violet: #7C5CFF;
+    --cyan: #3FE0D0;
+    --danger: #FF5B5B;
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--ink);
+    font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+/* Custom utility styles from user file */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.text-stroke-rank {
+  -webkit-text-stroke: 2px rgba(255, 255, 255, 0.22);
+  color: transparent;
+}
+
+@keyframes spin-slow {
+  to { transform: rotate(360deg); }
+}
+
+.animate-spin-slow {
+  animation: spin-slow 0.8s linear infinite;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.animate-shimmer {
+  background: linear-gradient(90deg, #141416 25%, #1c1c20 50%, #141416 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.4s infinite;
+}

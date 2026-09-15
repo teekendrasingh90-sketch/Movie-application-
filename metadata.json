@@ -1,0 +1,6 @@
+{
+  "name": "Nocturne",
+  "description": "Premium Movie & TV Series Streaming app with live search, curated rails, and embedded player",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
