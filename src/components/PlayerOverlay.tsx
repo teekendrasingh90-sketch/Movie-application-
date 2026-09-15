@@ -468,7 +468,7 @@ export const PlayerOverlay: React.FC<PlayerOverlayProps> = ({
       try {
         await navigator.share({
           title: item.title,
-          text: `Watch ${item.title} on Nocturne Cinema`,
+          text: `Watch ${item.title} on Pop`,
           url: window.location.href,
         });
         return;

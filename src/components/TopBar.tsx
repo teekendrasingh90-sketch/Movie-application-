@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search } from 'lucide-react';
+import { Search, User } from 'lucide-react';
 import { iosFeedback, motorVibrate } from '../services/iosFeedback';
 
 interface TopBarProps {
@@ -12,8 +12,10 @@ export const TopBar: React.FC<TopBarProps> = ({ onSearchClick, onAvatarClick, us
   return (
     <header className="px-5 pt-4 pb-2 relative z-20" id="topbar">
       <div className="flex items-center justify-between mb-3.5" id="brandrow">
-        <div className="text-[23px] font-extrabold tracking-[-0.4px]" id="brand-logo">
-          Noc<span className="text-[#FFB020]">turne</span>
+        <div className="text-[24px] font-black tracking-[-0.5px] flex items-center gap-1" id="brand-logo">
+          <span>P</span>
+          <span className="text-[#FFB020]">op</span>
+          <span className="w-1.5 h-1.5 rounded-full bg-[#FFB020] inline-block ml-0.5 animate-pulse" />
         </div>
         <button
           onClick={() => {
@@ -21,15 +23,19 @@ export const TopBar: React.FC<TopBarProps> = ({ onSearchClick, onAvatarClick, us
             iosFeedback('tap');
             onAvatarClick?.();
           }}
-          className="w-9 h-9 rounded-full overflow-hidden border-[1.5px] border-white/15 active:scale-90 transition-transform"
+          className="w-9 h-9 rounded-full overflow-hidden border-[1.5px] border-white/20 bg-gradient-to-tr from-[#1E1E24] to-[#2E2E38] flex items-center justify-center active:scale-90 transition-transform shadow-md"
           id="avatar-button"
           aria-label="User Profile"
         >
-          <img
-            src={userAvatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"}
-            alt="User Profile"
-            className="w-full h-full object-cover"
-          />
+          {userAvatar ? (
+            <img
+              src={userAvatar}
+              alt="User Profile"
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <User className="w-4 h-4 text-[#FFB020]" />
+          )}
         </button>
       </div>
 

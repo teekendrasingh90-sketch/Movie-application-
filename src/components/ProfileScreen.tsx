@@ -5,9 +5,8 @@ import {
   Camera,
   Check,
   Edit2,
-  Mail,
-  Copy,
-  ExternalLink
+  User,
+  Sparkles
 } from 'lucide-react';
 import { MediaItem } from '../types';
 import { iosFeedback, motorVibrate } from '../services/iosFeedback';
@@ -25,8 +24,9 @@ interface ProfileScreenProps {
 export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   watchlist,
   onOpenModal,
-  userName: initialName = 'Alex Rivera',
-  userAvatar: initialAvatar = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=80',
+  onClearWatchlist,
+  userName: initialName = 'Pop User',
+  userAvatar: initialAvatar = '',
   onUpdateProfile,
 }) => {
   const [hapticsOn, setHapticsOn] = useState(true);
@@ -34,7 +34,6 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
   const [avatar, setAvatar] = useState(initialAvatar);
   const [isEditingName, setIsEditingName] = useState(false);
   const [tempName, setTempName] = useState(initialName);
-  const [copiedEmail, setCopiedEmail] = useState(false);
   const [feedbackToast, setFeedbackToast] = useState<string | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -93,17 +92,6 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
     showToast('Profile name updated!');
   };
 
-  const handleCopyEmail = () => {
-    const email = 'teekendrasingh00@gmail.com';
-    if (navigator.clipboard) {
-      navigator.clipboard.writeText(email);
-      setCopiedEmail(true);
-      iosFeedback('pop');
-      showToast('Email address copied to clipboard!');
-      setTimeout(() => setCopiedEmail(false), 2500);
-    }
-  };
-
   return (
     <div className="pb-32 pt-4 px-4 sm:px-5 max-w-xl mx-auto w-full flex-1 select-none" id="screen-profile">
       {/* Toast Feedback */}
@@ -115,30 +103,35 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
       )}
 
       {/* Top Header */}
-      <div className="mb-4">
+      <div className="mb-4 flex items-center justify-between">
         <h1 className="text-[22px] font-extrabold tracking-[-0.4px] text-white">
           Profile
         </h1>
+        <span className="text-[12px] font-bold px-2.5 py-1 rounded-full bg-white/10 text-zinc-400 border border-white/10">
+          Pop v2.0
+        </span>
       </div>
 
       {/* User Card with Photo Upload and Name Update */}
       <div
-        className="p-5 rounded-[26px] bg-gradient-to-br from-[#7C5CFF]/20 via-white/[0.05] to-[#FFB020]/15 border border-white/12 shadow-xl mb-6 relative overflow-hidden"
+        className="p-5 rounded-[26px] bg-gradient-to-br from-[#FFB020]/15 via-white/[0.04] to-[#7C5CFF]/15 border border-white/12 shadow-xl mb-6 relative overflow-hidden"
         id="profile-card"
       >
         <div className="flex items-center gap-4">
           {/* Avatar with Camera Upload Trigger */}
           <div className="relative group shrink-0">
-            <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-white/25 shadow-lg bg-[#141418]">
-              <img
-                src={avatar}
-                alt={name}
-                className="w-full h-full object-cover"
-                onError={(e) => {
-                  e.currentTarget.src =
-                    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=80';
-                }}
-              />
+            <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-full overflow-hidden border-2 border-white/25 shadow-lg bg-[#141418] flex items-center justify-center">
+              {avatar ? (
+                <img
+                  src={avatar}
+                  alt={name}
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <div className="w-full h-full bg-gradient-to-tr from-[#1E1E24] to-[#2E2E38] flex items-center justify-center">
+                  <User className="w-8 h-8 text-[#FFB020]" />
+                </div>
+              )}
             </div>
             {/* Upload Button */}
             <button
@@ -198,11 +191,15 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
               </div>
             )}
 
-            <p className="text-[12.5px] text-[#9A9AA4] truncate">teekendrasingh00@gmail.com</p>
+            <div className="flex items-center gap-1.5 text-[12px] text-emerald-400 font-medium my-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse" />
+              <span>Private Device Profile</span>
+            </div>
 
             <div className="mt-2 flex items-center gap-2">
-              <span className="inline-block text-[10.5px] font-extrabold tracking-wide px-2.5 py-0.5 rounded-full bg-[#FFB020]/20 text-[#FFB020] border border-[#FFB020]/30">
-                NOCTURNE 4K PREMIUM
+              <span className="inline-flex items-center gap-1 text-[10.5px] font-extrabold tracking-wide px-2.5 py-0.5 rounded-full bg-[#FFB020]/20 text-[#FFB020] border border-[#FFB020]/30">
+                <Sparkles className="w-3 h-3" />
+                POP VIP 4K
               </span>
               <button
                 onClick={() => {
@@ -224,14 +221,21 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
           <h3 className="text-[18px] font-extrabold tracking-[-0.3px] text-[#F5F5F7]">
             My Watchlist ({watchlist.length})
           </h3>
-          <span className="text-[12.5px] text-[#5C5C66] font-semibold">Saved</span>
+          {watchlist.length > 0 && onClearWatchlist && (
+            <button
+              onClick={onClearWatchlist}
+              className="text-[12px] text-zinc-400 hover:text-rose-400 font-medium transition-colors"
+            >
+              Clear
+            </button>
+          )}
         </div>
 
         {watchlist.length === 0 ? (
           <div className="p-8 rounded-[18px] bg-white/[0.03] border border-white/10 text-center text-[#5C5C66]">
-            <p className="text-[13.5px]">Your watchlist is empty.</p>
+            <p className="text-[13.5px] text-zinc-300 font-medium">Your watchlist is empty.</p>
             <p className="text-[11.5px] mt-1 text-[#5C5C66]">
-              Tap the &ldquo;+&rdquo; button on any movie or series to save it here.
+              Tap the &ldquo;+&rdquo; button on any movie or series to save it here on your device.
             </p>
           </div>
         ) : (
@@ -272,7 +276,7 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             </div>
             <div className="flex-1 min-w-0">
               <div className="text-[14px] font-semibold text-white">Haptic Feedback</div>
-              <div className="text-[11.5px] text-[#5C5C66]">Vibration on taps & player controls</div>
+              <div className="text-[11.5px] text-[#5C5C66]">Vibration on taps &amp; player controls</div>
             </div>
             <button
               onClick={toggleHaptic}
@@ -288,46 +292,19 @@ export const ProfileScreen: React.FC<ProfileScreenProps> = ({
             </button>
           </div>
 
-          {/* Help & Support with teekendrasingh00@gmail.com */}
+          {/* App Info */}
           <div className="p-4 bg-white/[0.02]" id="help-support-section">
             <div className="flex items-start gap-3">
               <div className="w-9 h-9 rounded-[10px] bg-white/[0.08] flex items-center justify-center shrink-0 mt-0.5">
-                <HelpCircle className="w-4 h-4 text-white" />
+                <HelpCircle className="w-4 h-4 text-[#FFB020]" />
               </div>
               <div className="flex-1 min-w-0">
                 <div className="text-[14px] font-bold text-white mb-1">
-                  Help & Support
+                  About Pop Streaming
                 </div>
-                <p className="text-[12px] text-[#9A9AA4] mb-2 leading-snug">
-                  Kisi bhi samasya ya feedback ke liye support email par sampark karein:
+                <p className="text-[12px] text-[#9A9AA4] leading-relaxed">
+                  Pop par sabhi movies aur web series seedhe Ultra HD me play hoti hain. Fast streaming aur clean cinematic experience ke sath.
                 </p>
-                <div className="p-2.5 rounded-xl bg-black/40 border border-white/10 flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <Mail className="w-4 h-4 text-[#FFB020] shrink-0" />
-                    <span className="text-[12.5px] font-mono text-[#F5F5F7] truncate font-medium">
-                      teekendrasingh00@gmail.com
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <button
-                      onClick={handleCopyEmail}
-                      id="copy-support-email-btn"
-                      className="px-2.5 py-1 rounded-lg bg-white/10 hover:bg-white/15 text-[11px] font-bold text-white flex items-center gap-1 transition-all active:scale-95"
-                      title="Copy Email"
-                    >
-                      {copiedEmail ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-3 h-3" />}
-                      <span>{copiedEmail ? 'Copied' : 'Copy'}</span>
-                    </button>
-                    <a
-                      href="mailto:teekendrasingh00@gmail.com?subject=Nocturne%20Cinema%20Support%20Query"
-                      className="px-2.5 py-1 rounded-lg bg-[#FFB020] hover:bg-[#FFC043] text-[11px] font-bold text-black flex items-center gap-1 transition-all active:scale-95"
-                      title="Send Email"
-                    >
-                      <ExternalLink className="w-3 h-3" />
-                      <span>Email</span>
-                    </a>
-                  </div>
-                </div>
               </div>
             </div>
           </div>

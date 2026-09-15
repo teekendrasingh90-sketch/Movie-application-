@@ -21,7 +21,6 @@ import { PlayerOverlay } from './components/PlayerOverlay';
 import { BottomNav } from './components/BottomNav';
 import { SearchScreen } from './components/SearchScreen';
 import { ProfileScreen } from './components/ProfileScreen';
-import { CinematicPlayAnimation } from './components/CinematicPlayAnimation';
 import { MovieInstallModal } from './components/MovieInstallModal';
 import { InterfaceIntroSplash } from './components/InterfaceIntroSplash';
 
@@ -56,9 +55,7 @@ export default function App() {
   const [playerItem, setPlayerItem] = useState<MediaItem | null>(null);
   const [isPlayerOpen, setIsPlayerOpen] = useState<boolean>(false);
 
-  // Cinematic & Install Animation states
-  const [cinematicPlayItem, setCinematicPlayItem] = useState<MediaItem | null>(null);
-  const [isCinematicPlayActive, setIsCinematicPlayActive] = useState<boolean>(false);
+  // Install Animation states
   const [installItem, setInstallItem] = useState<MediaItem | null>(null);
   const [isInstallOpen, setIsInstallOpen] = useState<boolean>(false);
   const [showInterfaceIntro, setShowInterfaceIntro] = useState<boolean>(true);
@@ -66,57 +63,29 @@ export default function App() {
   // Glow lighting
   const [glowIndex, setGlowIndex] = useState<number>(0);
 
-  // Watchlist & Continue Watching (persisted)
-  const [watchlist, setWatchlist] = useState<MediaItem[]>(() => {
-    try {
-      const saved = localStorage.getItem('nocturne_watchlist');
-      return saved ? JSON.parse(saved) : FALLBACK_MOVIES.slice(0, 3);
-    } catch {
-      return FALLBACK_MOVIES.slice(0, 3);
-    }
+  // Watchlist & Continue Watching (pure in-memory state)
+  const [watchlist, setWatchlist] = useState<MediaItem[]>([]);
+  const [continueWatching, setContinueWatching] = useState<MediaItem[]>([]);
+
+  // User profile state (name and avatar photo) in-memory
+  const [userProfile, setUserProfile] = useState<{ name: string; avatar: string }>({
+    name: 'Pop User',
+    avatar: '',
   });
 
-  const [continueWatching, setContinueWatching] = useState<MediaItem[]>(() => {
+  // Clear any existing localStorage data once on mount so browser storage is clean
+  useEffect(() => {
     try {
-      const saved = localStorage.getItem('nocturne_continue');
-      return saved ? JSON.parse(saved) : [
-        { ...FALLBACK_MOVIES[0], progress: 68 },
-        { ...FALLBACK_TV[0], progress: 42 }
-      ];
-    } catch {
-      return [
-        { ...FALLBACK_MOVIES[0], progress: 68 },
-        { ...FALLBACK_TV[0], progress: 42 }
-      ];
-    }
-  });
-
-  // User profile state (name and avatar photo) persisted locally
-  const [userProfile, setUserProfile] = useState<{ name: string; avatar: string }>(() => {
-    try {
-      const savedName = localStorage.getItem('nocturne_user_name');
-      const savedAvatar = localStorage.getItem('nocturne_user_avatar');
-      return {
-        name: savedName || 'Alex Rivera',
-        avatar:
-          savedAvatar ||
-          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=80',
-      };
-    } catch {
-      return {
-        name: 'Alex Rivera',
-        avatar:
-          'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=160&q=80',
-      };
-    }
-  });
+      localStorage.clear();
+    } catch {}
+  }, []);
 
   const handleUpdateProfile = (newName: string, newAvatar: string) => {
     setUserProfile({ name: newName, avatar: newAvatar });
-    try {
-      localStorage.setItem('nocturne_user_name', newName);
-      localStorage.setItem('nocturne_user_avatar', newAvatar);
-    } catch {}
+  };
+
+  const handleClearWatchlist = () => {
+    setWatchlist([]);
   };
 
   // Load Movies on initial mount
@@ -278,16 +247,11 @@ export default function App() {
   const handleToggleWatchlist = (item: MediaItem) => {
     setWatchlist((prev) => {
       const exists = prev.some((w) => String(w.id) === String(item.id));
-      let updated: MediaItem[];
       if (exists) {
-        updated = prev.filter((w) => String(w.id) !== String(item.id));
+        return prev.filter((w) => String(w.id) !== String(item.id));
       } else {
-        updated = [item, ...prev].slice(0, 30);
+        return [item, ...prev].slice(0, 30);
       }
-      try {
-        localStorage.setItem('nocturne_watchlist', JSON.stringify(updated));
-      } catch {}
-      return updated;
     });
   };
 
@@ -299,37 +263,21 @@ export default function App() {
     // Also push to continue watching
     setContinueWatching((prev) => {
       const filtered = prev.filter((c) => String(c.id) !== String(item.id));
-      const updated = [{ ...item, progress: Math.floor(Math.random() * 40) + 20 }, ...filtered].slice(0, 10);
-      try {
-        localStorage.setItem('nocturne_continue', JSON.stringify(updated));
-      } catch {}
-      return updated;
+      return [{ ...item, progress: Math.floor(Math.random() * 40) + 20 }, ...filtered].slice(0, 10);
     });
   };
 
-  // Play handler with cinematic theatre entrance animation
+  // Play handler - directly opens video player without countdown timer
   const handlePlay = (item: MediaItem) => {
     setIsModalOpen(false);
-    setCinematicPlayItem(item);
-    setIsCinematicPlayActive(true);
+    setPlayerItem(item);
+    setIsPlayerOpen(true);
 
     // Save to continue watching
     setContinueWatching((prev) => {
       const filtered = prev.filter((c) => String(c.id) !== String(item.id));
-      const updated = [{ ...item, progress: Math.floor(Math.random() * 30) + 15 }, ...filtered].slice(0, 10);
-      try {
-        localStorage.setItem('nocturne_continue', JSON.stringify(updated));
-      } catch {}
-      return updated;
+      return [{ ...item, progress: Math.floor(Math.random() * 30) + 15 }, ...filtered].slice(0, 10);
     });
-  };
-
-  const handleCinematicAnimationComplete = () => {
-    setIsCinematicPlayActive(false);
-    if (cinematicPlayItem) {
-      setPlayerItem(cinematicPlayItem);
-      setIsPlayerOpen(true);
-    }
   };
 
   // Open install movie modal
@@ -353,7 +301,7 @@ export default function App() {
   const activeGlows = GLOW_PALETTES[glowIndex % GLOW_PALETTES.length];
 
   return (
-    <div className="relative min-h-screen bg-[#08080A] text-[#F5F5F7] overflow-x-hidden select-none" id="nocturne-app">
+    <div className="relative min-h-screen bg-[#08080A] text-[#F5F5F7] overflow-x-hidden select-none" id="pop-app">
       {/* Ambient Lighting Glows */}
       <div
         className="fixed top-[-120px] left-[-120px] w-[380px] h-[380px] rounded-full blur-[100px] pointer-events-none transition-all duration-1000 opacity-40 z-0"
@@ -531,6 +479,7 @@ export default function App() {
                 userName={userProfile.name}
                 userAvatar={userProfile.avatar}
                 onUpdateProfile={handleUpdateProfile}
+                onClearWatchlist={handleClearWatchlist}
               />
             )}
           </motion.div>
@@ -571,13 +520,6 @@ export default function App() {
           allMedia={allPool}
           onSelectItem={handlePlay}
           onInstallMovie={handleOpenInstall}
-        />
-
-        {/* Cinematic Movie Play Animation */}
-        <CinematicPlayAnimation
-          item={cinematicPlayItem}
-          isOpen={isCinematicPlayActive}
-          onComplete={handleCinematicAnimationComplete}
         />
 
         {/* Movie Install Modal */}

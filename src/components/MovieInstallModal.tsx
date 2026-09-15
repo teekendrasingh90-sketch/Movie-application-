@@ -56,16 +56,6 @@ export const MovieInstallModal: React.FC<MovieInstallModalProps> = ({
           setStepIndex(3);
           iosFeedback('success');
 
-          // Save to installed storage
-          try {
-            const raw = localStorage.getItem('nocturne_installed_movies');
-            const installed: MediaItem[] = raw ? JSON.parse(raw) : [];
-            if (!installed.some((m) => String(m.id) === String(item.id))) {
-              const updated = [item, ...installed];
-              localStorage.setItem('nocturne_installed_movies', JSON.stringify(updated));
-            }
-          } catch {}
-
           if (onInstallComplete) {
             onInstallComplete(item);
           }

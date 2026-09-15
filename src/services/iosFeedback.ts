@@ -5,21 +5,8 @@ let audioCtx: AudioContext | null = null;
 let soundEnabled = true;
 let hapticsEnabled = true;
 
-// Initialize preferences from localStorage if available
-if (typeof window !== 'undefined') {
-  try {
-    const savedSound = localStorage.getItem('nocturne_sound');
-    if (savedSound !== null) soundEnabled = savedSound === 'true';
-    const savedHaptics = localStorage.getItem('nocturne_haptics');
-    if (savedHaptics !== null) hapticsEnabled = savedHaptics === 'true';
-  } catch {}
-}
-
 export function setSoundEnabled(enabled: boolean) {
   soundEnabled = enabled;
-  try {
-    localStorage.setItem('nocturne_sound', String(enabled));
-  } catch {}
 }
 
 export function isSoundEnabled(): boolean {
@@ -28,9 +15,6 @@ export function isSoundEnabled(): boolean {
 
 export function setHapticsEnabled(enabled: boolean) {
   hapticsEnabled = enabled;
-  try {
-    localStorage.setItem('nocturne_haptics', String(enabled));
-  } catch {}
 }
 
 export function isHapticsEnabled(): boolean {

@@ -68,18 +68,18 @@ export const InterfaceIntroSplash: React.FC<InterfaceIntroSplashProps> = ({ onFi
             initial={{ y: 15, opacity: 0, letterSpacing: '0.3em' }}
             animate={{ y: 0, opacity: 1, letterSpacing: '0.15em' }}
             transition={{ delay: 0.15, duration: 0.45 }}
-            className="text-3xl sm:text-4xl font-black text-white tracking-[0.18em] uppercase drop-shadow-[0_0_25px_rgba(255,176,32,0.4)]"
+            className="text-4xl sm:text-5xl font-black text-white tracking-[0.2em] uppercase drop-shadow-[0_0_25px_rgba(255,176,32,0.4)]"
           >
-            Noc<span className="text-[#FFB020]">turne</span>
+            P<span className="text-[#FFB020]">op</span>
           </motion.h1>
 
           <motion.p
             initial={{ y: 10, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
             transition={{ delay: 0.25, duration: 0.4 }}
-            className="text-[11.5px] font-extrabold uppercase tracking-[0.25em] text-[#8E8E93] mt-2"
+            className="text-[12px] font-extrabold uppercase tracking-[0.25em] text-[#8E8E93] mt-2"
           >
-            Cinematic Streaming Interface
+            Movies &amp; Web Series
           </motion.p>
 
           {/* Loading line indicator */}
